@@ -41,34 +41,20 @@
             { "word": "sanction", "synonyms": [ { "word": "punition", "score": 3 }, { "word": "mesure disciplinaire", "score": 2 } ] },
             { "word": "refuge", "synonyms": [ { "word": "abri", "score": 3 }, { "word": "asile", "score": 2 } ] },
             { "word": "calendrier", "synonyms": [ { "word": "agenda", "score": 3 }, { "word": "planning", "score": 2 } ] },
-            { "word": "baleine", "synonyms": [ { "word": "cétacé", "score": 3 }, { "word": "mammifère marin", "score": 2 } ] },
-            { "word": "mime", "synonyms": [ { "word": "pantomime", "score": 3 }, { "word": "acteur silencieux", "score": 2 } ] },
-            { "word": "persévérer", "synonyms": [ { "word": "tenir bon", "score": 3 }, { "word": "continuer", "score": 2 } ] },
-            { "word": "sauvage", "synonyms": [ { "word": "feroce", "score": 3 }, { "word": "indompté", "score": 2 } ] },
-            { "word": "héréditaire", "synonyms": [ { "word": "génétique", "score": 3 }, { "word": "transmis", "score": 2 } ] },
-            { "word": "connivence", "synonyms": [ { "word": "complicité", "score": 3 }, { "word": "accord secret", "score": 2 } ] },
-            { "word": "grandiose", "synonyms": [ { "word": "magnifique", "score": 3 }, { "word": "imposant", "score": 2 } ] },
-            { "word": "confier", "synonyms": [ { "word": "remettre", "score": 3 }, { "word": "dévoiler", "score": 2 } ] },
-            { "word": "vigoureux", "synonyms": [ { "word": "énergique", "score": 3 }, { "word": "fort", "score": 2 } ] },
-            { "word": "contracter", "synonyms": [ { "word": "acquérir", "score": 3 }, { "word": "réduire", "score": 2 } ] },
-            { "word": "initiative", "synonyms": [ { "word": "proposition", "score": 3 }, { "word": "démarche", "score": 2 } ] },
-            { "word": "esquisse", "synonyms": [ { "word": "croquis", "score": 3 }, { "word": "ébauche", "score": 2 } ] },
-            { "word": "irritable", "synonyms": [ { "word": "nerveux", "score": 3 }, { "word": "susceptible", "score": 2 } ] },
-            { "word": "invectiver", "synonyms": [ { "word": "insulter", "score": 3 }, { "word": "réprimander", "score": 2 } ] },
-            { "word": "hétérogène", "synonyms": [ { "word": "varié", "score": 3 }, { "word": "composite", "score": 2 } ] },
-            { "word": "assimiler", "synonyms": [ { "word": "comprendre", "score": 3 }, { "word": "intégrer", "score": 2 } ] },
-            { "word": "concertation", "synonyms": [ { "word": "discussion", "score": 3 }, { "word": "consultation", "score": 2 } ] },
-            { "word": "émulation", "synonyms": [ { "word": "rivalité", "score": 3 }, { "word": "motivation", "score": 2 } ] },
-            { "word": "pittoresque", "synonyms": [ { "word": "charmant", "score": 3 }, { "word": "coloré", "score": 2 } ] },
-            { "word": "évasif", "synonyms": [ { "word": "vague", "score": 3 }, { "word": "indéfini", "score": 2 } ] },
-            { "word": "élaborer", "synonyms": [ { "word": "développer", "score": 3 }, { "word": "préparer", "score": 2 } ] },
-            { "word": "prosaïque", "synonyms": [ { "word": "banal", "score": 3 }, { "word": "ordinaire", "score": 2 } ] },
-            { "word": "apologie", "synonyms": [ { "word": "défense", "score": 3 }, { "word": "justification", "score": 2 } ] },
-            { "word": "conjecture", "synonyms": [ { "word": "supposition", "score": 3 }, { "word": "hypothèse", "score": 2 } ] }
+            { "word": "baleine", "synonyms": [ { "word": "cétacé", "score": 3 }, { "word": "mammifère marin", "score": 2 } ] }
         ];
 
         let currentIndex = 0;
         let totalScore = 0;
+
+        // حساب أقصى مجموع ممكن
+        const maxScore = data.reduce((acc, item) => {
+            return acc + Math.max(...item.synonyms.map(s => s.score));
+        }, 0);
+
+        function normalize(str) {
+            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+        }
 
         function showWord() {
             document.getElementById("word").textContent = "Mot: " + data[currentIndex].word;
@@ -77,28 +63,50 @@
         }
 
         function checkAnswer() {
-            const input = document.getElementById("answer").value.trim().toLowerCase();
+            const input = normalize(document.getElementById("answer").value.trim());
             const syns = data[currentIndex].synonyms;
             let score = 0;
 
             for (let s of syns) {
-                if (input === s.word.toLowerCase()) {
+                if (normalize(s.word) === input) {
                     score = s.score;
+                    break;
                 }
             }
 
             totalScore += score;
+
             document.getElementById("result").textContent = "Score pour ce mot: " + score;
-            document.getElementById("final-score").textContent = "Score total: " + totalScore;
+            document.getElementById("result").style.color = score > 0 ? "green" : "red";
+            document.getElementById("final-score").textContent = "Score total actuel: " + totalScore;
         }
 
         function nextWord() {
             currentIndex++;
             if (currentIndex >= data.length) {
-                alert("Vous avez terminé le quiz! Score final: " + totalScore);
-                currentIndex = 0;
-                totalScore = 0;
+                const finalScore99 = Math.round((totalScore / maxScore) * 99);
+                document.getElementById("quiz").innerHTML = `
+                    <h2>Quiz terminé!</h2>
+                    <p>Score final sur 99: ${finalScore99}</p>
+                    <button onclick="restartQuiz()">Recommencer</button>
+                `;
+                return;
             }
+            showWord();
+        }
+
+        function restartQuiz() {
+            currentIndex = 0;
+            totalScore = 0;
+            document.getElementById("quiz").innerHTML = `
+                <p id="word"></p>
+                <input type="text" id="answer" placeholder="Entrez un synonyme...">
+                <br>
+                <button onclick="checkAnswer()">Valider</button>
+                <button onclick="nextWord()">Mot suivant</button>
+                <p id="result"></p>
+                <p id="final-score"></p>
+            `;
             showWord();
         }
 
