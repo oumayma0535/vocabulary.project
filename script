@@ -1,0 +1,46 @@
+import java.util.*;
+
+class Synonym {
+    String word;
+    int score;
+
+    Synonym(String word, int score) {
+        this.word = word;
+        this.score = score;
+    }
+}
+
+class VocabularyWord {
+    String word;
+    List<Synonym> synonyms;
+
+    VocabularyWord(String word, List<Synonym> synonyms) {
+        this.word = word;
+        this.synonyms = synonyms;
+    }
+}
+
+public class VocabularyTest {
+
+    public static void main(String[] args) {
+        // ---------- 1) Create vocabulary list ----------
+        List<VocabularyWord> vocab = new ArrayList<>();
+
+        vocab.add(new VocabularyWord("bateau", Arrays.asList(
+                new Synonym("navire", 3),
+                new Synonym("embarcation", 2)
+        )));
+
+        vocab.add(new VocabularyWord("fauteuil", Arrays.asList(
+                new Synonym("chaise confortable", 3),
+                new Synonym("siège", 2)
+        )));
+
+        vocab.add(new VocabularyWord("bol", Arrays.asList(
+                new Synonym("récipient", 3),
+                new Synonym("tasse", 2)
+        )));
+
+        vocab.add(new VocabularyWord("instruire", Arrays.asList(
+                new Synonym("enseigner", 3),
+                new Synonym("former", 2)
