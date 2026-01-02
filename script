@@ -1,46 +1,70 @@
-import java.util.*;
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Vocabulary Test</title>
+</head>
+<body>
 
-class Synonym {
-    String word;
-    int score;
+  <h2 id="word"></h2>
 
-    Synonym(String word, int score) {
-        this.word = word;
-        this.score = score;
+  <div id="options"></div>
+
+  <p id="progress"></p>
+
+  <button onclick="nextQuestion()">Question suivante</button>
+
+  <script>
+    let questions = [];
+    let currentIndex = 0;
+    let totalScore = 0;
+
+    // تحميل ملف JSON
+    fetch("vocabulary_questions.json")
+      .then(response => response.json())
+      .then(data => {
+        questions = data;
+        showQuestion();
+      });
+
+    function showQuestion() {
+      const question = questions[currentIndex];
+
+      document.getElementById("word").textContent = question.text;
+      document.getElementById("options").innerHTML = "";
+      document.getElementById("progress").textContent =
+        `Question ${currentIndex + 1} / ${questions.length}`;
+
+      question.options.forEach(option => {
+        const btn = document.createElement("button");
+        btn.textContent = option.text;
+
+        btn.onclick = () => {
+          totalScore += option.score;
+          nextQuestion();
+        };
+
+        document.getElementById("options").appendChild(btn);
+      });
     }
-}
 
-class VocabularyWord {
-    String word;
-    List<Synonym> synonyms;
+    function nextQuestion() {
+      currentIndex++;
 
-    VocabularyWord(String word, List<Synonym> synonyms) {
-        this.word = word;
-        this.synonyms = synonyms;
+      if (currentIndex < questions.length) {
+        showQuestion();
+      } else {
+        showResult();
+      }
     }
-}
 
-public class VocabularyTest {
+    function showResult() {
+      document.body.innerHTML = `
+        <h2>الاختبار انتهى</h2>
+        <p>السكور الكلي: ${totalScore}</p>
+      `;
+    }
+  </script>
 
-    public static void main(String[] args) {
-        // ---------- 1) Create vocabulary list ----------
-        List<VocabularyWord> vocab = new ArrayList<>();
-
-        vocab.add(new VocabularyWord("bateau", Arrays.asList(
-                new Synonym("navire", 3),
-                new Synonym("embarcation", 2)
-        )));
-
-        vocab.add(new VocabularyWord("fauteuil", Arrays.asList(
-                new Synonym("chaise confortable", 3),
-                new Synonym("siège", 2)
-        )));
-
-        vocab.add(new VocabularyWord("bol", Arrays.asList(
-                new Synonym("récipient", 3),
-                new Synonym("tasse", 2)
-        )));
-
-        vocab.add(new VocabularyWord("instruire", Arrays.asList(
-                new Synonym("enseigner", 3),
-                new Synonym("former", 2)
+</body>
+</html>
