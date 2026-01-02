@@ -1,116 +1,25 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vocabulaire Quiz</title>
-    <style>
-        body { font-family: Arial, sans-serif; background-color: #f0f4f8; text-align: center; padding: 20px; }
-        h1 { color: #333; }
-        #wrapper { max-width: 500px; margin: 0 auto; }
-        #quiz { background-color: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        input { padding: 10px; width: 200px; margin: 10px 0; border-radius: 5px; border: 1px solid #ccc; }
-        button { padding: 10px 20px; margin: 5px; border: none; border-radius: 5px; background-color: #4CAF50; color: #fff; cursor: pointer; }
-        button:hover { background-color: #45a049; }
-        #result { margin-top: 10px; font-weight: bold; }
-        #final-score { font-size: 1.2em; color: #e91e63; margin-top: 15px; }
-    </style>
+  <meta charset="UTF-8">
+  <title>Vocabulary Test</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    h2 { color: #333; }
+    button { margin: 5px; padding: 10px 15px; font-size: 16px; cursor: pointer; }
+    #options button:hover { background-color: #eee; }
+    #progress { margin-top: 10px; font-weight: bold; }
+  </style>
 </head>
 <body>
-    <div id="wrapper">
-        <h1>Vocabulaire – Trouve le synonyme</h1>
-        <div id="quiz">
-            <p id="word"></p>
-            <input type="text" id="answer" placeholder="Entrez un synonyme...">
-            <br>
-            <button onclick="checkAnswer()">Valider</button>
-            <button onclick="nextWord()">Mot suivant</button>
-            <p id="result"></p>
-            <p id="final-score"></p>
-        </div>
-    </div>
 
-    <script>
-        const data = [
-            { "word": "bateau", "synonyms": [ { "word": "navire", "score": 3 }, { "word": "embarcation", "score": 2 } ] },
-            { "word": "fauteuil", "synonyms": [ { "word": "chaise confortable", "score": 3 }, { "word": "siège", "score": 2 } ] },
-            { "word": "bol", "synonyms": [ { "word": "récipient", "score": 3 }, { "word": "tasse", "score": 2 } ] },
-            { "word": "instruire", "synonyms": [ { "word": "enseigner", "score": 3 }, { "word": "former", "score": 2 } ] },
-            { "word": "hier", "synonyms": [ { "word": "la veille", "score": 3 }, { "word": "le jour passé", "score": 2 } ] },
-            { "word": "arracher", "synonyms": [ { "word": "retirer", "score": 3 }, { "word": "extraire", "score": 2 } ] },
-            { "word": "sanction", "synonyms": [ { "word": "punition", "score": 3 }, { "word": "mesure disciplinaire", "score": 2 } ] },
-            { "word": "refuge", "synonyms": [ { "word": "abri", "score": 3 }, { "word": "asile", "score": 2 } ] },
-            { "word": "calendrier", "synonyms": [ { "word": "agenda", "score": 3 }, { "word": "planning", "score": 2 } ] },
-            { "word": "baleine", "synonyms": [ { "word": "cétacé", "score": 3 }, { "word": "mammifère marin", "score": 2 } ] }
-        ];
+  <h2 id="word">Chargement...</h2>
 
-        let currentIndex = 0;
-        let totalScore = 0;
+  <div id="options"></div>
 
-        // حساب أقصى مجموع ممكن
-        const maxScore = data.reduce((acc, item) => {
-            return acc + Math.max(...item.synonyms.map(s => s.score));
-        }, 0);
+  <p id="progress"></p>
 
-        function normalize(str) {
-            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-        }
+  <script src="script.js"></script>
 
-        function showWord() {
-            document.getElementById("word").textContent = "Mot: " + data[currentIndex].word;
-            document.getElementById("answer").value = "";
-            document.getElementById("result").textContent = "";
-        }
-
-        function checkAnswer() {
-            const input = normalize(document.getElementById("answer").value.trim());
-            const syns = data[currentIndex].synonyms;
-            let score = 0;
-
-            for (let s of syns) {
-                if (normalize(s.word) === input) {
-                    score = s.score;
-                    break;
-                }
-            }
-
-            totalScore += score;
-
-            document.getElementById("result").textContent = "Score pour ce mot: " + score;
-            document.getElementById("result").style.color = score > 0 ? "green" : "red";
-            document.getElementById("final-score").textContent = "Score total actuel: " + totalScore;
-        }
-
-        function nextWord() {
-            currentIndex++;
-            if (currentIndex >= data.length) {
-                const finalScore99 = Math.round((totalScore / maxScore) * 99);
-                document.getElementById("quiz").innerHTML = `
-                    <h2>Quiz terminé!</h2>
-                    <p>Score final sur 99: ${finalScore99}</p>
-                    <button onclick="restartQuiz()">Recommencer</button>
-                `;
-                return;
-            }
-            showWord();
-        }
-
-        function restartQuiz() {
-            currentIndex = 0;
-            totalScore = 0;
-            document.getElementById("quiz").innerHTML = `
-                <p id="word"></p>
-                <input type="text" id="answer" placeholder="Entrez un synonyme...">
-                <br>
-                <button onclick="checkAnswer()">Valider</button>
-                <button onclick="nextWord()">Mot suivant</button>
-                <p id="result"></p>
-                <p id="final-score"></p>
-            `;
-            showWord();
-        }
-
-        showWord();
-    </script>
 </body>
 </html>
